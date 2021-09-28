@@ -4,6 +4,9 @@ from django.db import models
 class Course(models.Model):
     name = models.CharField(max_length=150)
 
+    def __str__(self):
+        return self.name if self.name else super().__str__()
+
 
 class Scorecard(models.Model):
     course = models.ForeignKey(
@@ -13,6 +16,9 @@ class Scorecard(models.Model):
         related_query_name="scorecard",
     )
     title = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.title if self.title else super().__str__()
 
 
 class ScorecardHole(models.Model):
