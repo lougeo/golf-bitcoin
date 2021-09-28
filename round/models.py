@@ -20,10 +20,10 @@ class Round(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    tee_time = models.DateTimeField(blank=True, null=True)
 
     title = models.CharField(max_length=150)
     description = models.TextField(max_length=500)
-    tee_time = models.DateTimeField(blank=True, null=True)
 
 
 class UserRound(models.Model):
