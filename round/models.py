@@ -25,6 +25,9 @@ class Round(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField(max_length=500)
 
+    def __str__(self):
+        return self.title if self.title else f"Round: {self.pk}"
+
 
 class UserRound(models.Model):
     user = models.ForeignKey(
@@ -77,6 +80,9 @@ class Score(models.Model):
         related_name="scores",
         related_query_name="score",
     )
+
+    def __str__(self):
+        return f"Score: {self.pk}"
 
 
 class Hole(models.Model):
