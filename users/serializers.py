@@ -40,9 +40,16 @@ class AuthTokenSerializer(serializers.Serializer):
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
+    password_confirm = serializers.CharField(
+        label=_("Confirm Password"),
+        style={"input_type": "password"},
+        trim_whitespace=False,
+        write_only=True,
+    )
+
     class Meta:
         model = User
-        fields = ("id", "email", "password")
+        fields = ("id", "email", "password", "password_confirm")
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -50,6 +57,18 @@ class CreateUserSerializer(serializers.ModelSerializer):
             validated_data["email"], validated_data["password"]
         )
         return user
+
+    def validate(self, data):
+        """
+        Check that passwords match.
+        """
+        if data["password"] != data["password_confirm"]:
+            raise serializers.ValidationError(
+                {
+                    "password": "Passwords don't match!",
+                }
+            )
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):
