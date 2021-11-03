@@ -1,7 +1,14 @@
-from django.urls import path
+from django.urls import path, include
 
-from . import views
+from rest_framework import routers
+
+from .viewsets import CourseViewSet
 
 app_name = "course"
 
-urlpatterns = []
+router = routers.SimpleRouter()
+router.register("courses", CourseViewSet)
+
+urlpatterns = [
+    path("api/", include(router.urls)),
+]
