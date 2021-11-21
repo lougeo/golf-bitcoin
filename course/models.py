@@ -18,7 +18,7 @@ class Scorecard(models.Model):
     title = models.CharField(max_length=150)
 
     def __str__(self):
-        return self.title if self.title else super().__str__()
+        return f"{self.title} @ {self.course}"
 
 
 class ScorecardHole(models.Model):
