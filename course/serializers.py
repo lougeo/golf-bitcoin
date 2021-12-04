@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
-from .models import Course, Scorecard
+from .models import Course, Scorecard, ScorecardHole
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -11,7 +11,36 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ScorecardHoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScorecardHole
+        exclude = ["scorecard"]
+
+
 class ScorecardSerializer(serializers.ModelSerializer):
+    scorecard_holes = ScorecardHoleSerializer(many=True)
+
     class Meta:
         model = Scorecard
         fields = "__all__"
+
+    def create(self, validated_data):
+        scorecardholes_data = validated_data.pop("scorecard_holes")
+        scorecard = super().create(validated_data)
+        for scorecardhole_data in scorecardholes_data:
+            ScorecardHole.objects.create(scorecard=scorecard, **scorecardhole_data)
+        return scorecard
+
+    def update(self, instance, validated_data):
+        # slightly more complicated so going to leave for now
+        scorecardholes_data = validated_data.pop("scorecard_holes")
+        scorecard = super().update(instance, validated_data)
+        for scorecardhole_data in scorecardholes_data:
+            # print(scorecardhole_data)
+            # pk = scorecardhole_data.pop("pk")
+            number = scorecardhole_data.pop("number")
+            obj, created = ScorecardHole.objects.update_or_create(
+                scorecard=scorecard, number=number, defaults=scorecardhole_data
+            )
+
+        return scorecard
