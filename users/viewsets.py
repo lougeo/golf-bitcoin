@@ -1,21 +1,27 @@
+import datetime
 from django.contrib.auth import login
 
-from rest_framework import viewsets, permissions, generics
-from rest_framework.authentication import BasicAuthentication
+from rest_framework import viewsets, views, permissions, generics
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework import permissions
 
+from knox.auth import TokenAuthentication
 from knox.views import LoginView as KnoxLoginView
 from knox.models import AuthToken
 
-from .serializers import CreateUserSerializer, UserSerializer, AuthTokenSerializer
+from .serializers import (
+    CreateUserSerializer,
+    UserSerializer,
+    LoginSerializer,
+)
 
 
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
-        serializer = AuthTokenSerializer(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         login(request, user)
@@ -37,3 +43,22 @@ class RegistrationAPI(generics.GenericAPIView):
                 "token": AuthToken.objects.create(user)[1],
             }
         )
+
+
+class TokenValidationAPI(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        # Will raise a 401 if authentication fails (except in the case of bad key format)
+        # This method will both delete any expired tokens, and renew valid ones
+        valid = TokenAuthentication().authenticate(request)
+
+        if valid:
+            user, auth_token = valid
+            # auth_token.expiry = auth_token.expiry - datetime.timedelta(days=2)
+            # auth_token.save()
+            # user, auth_token = TokenAuthentication().authenticate(request)
+
+            return Response({"user": UserSerializer(user).data})
+        else:
+            raise AuthenticationFailed("Invalid Token.")
