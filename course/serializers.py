@@ -6,6 +6,8 @@ from .models import Course, Scorecard, ScorecardHole
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    id = serializers.CharField()
+
     class Meta:
         model = Course
         fields = "__all__"
