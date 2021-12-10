@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 
+from .filters import CourseFilter
 from .models import Course, Scorecard, ScorecardHole
 from .serializers import CourseSerializer, ScorecardSerializer
 
@@ -7,6 +8,7 @@ from .serializers import CourseSerializer, ScorecardSerializer
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    filterset_class = CourseFilter
 
 
 class ScorecardViewSet(viewsets.ModelViewSet):
