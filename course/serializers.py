@@ -5,14 +5,6 @@ from rest_framework import serializers
 from .models import Course, Scorecard, ScorecardHole
 
 
-class CourseSerializer(serializers.ModelSerializer):
-    id = serializers.CharField()
-
-    class Meta:
-        model = Course
-        fields = "__all__"
-
-
 class ScorecardHoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScorecardHole
@@ -46,3 +38,20 @@ class ScorecardSerializer(serializers.ModelSerializer):
             )
 
         return scorecard
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    id = serializers.CharField()
+    scorecards = ScorecardSerializer(many=True)
+
+    class Meta:
+        model = Course
+        fields = "__all__"
+
+
+class CourseListSerializer(serializers.ModelSerializer):
+    id = serializers.CharField()
+
+    class Meta:
+        model = Course
+        fields = "__all__"

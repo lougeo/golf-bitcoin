@@ -2,13 +2,18 @@ from rest_framework import viewsets
 
 from .filters import CourseFilter
 from .models import Course, Scorecard, ScorecardHole
-from .serializers import CourseSerializer, ScorecardSerializer
+from .serializers import CourseSerializer, CourseListSerializer, ScorecardSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
-    serializer_class = CourseSerializer
     filterset_class = CourseFilter
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return CourseSerializer
+        else:
+            return CourseListSerializer
 
 
 class ScorecardViewSet(viewsets.ModelViewSet):
