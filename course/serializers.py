@@ -6,12 +6,15 @@ from .models import Course, Scorecard, ScorecardHole
 
 
 class ScorecardHoleSerializer(serializers.ModelSerializer):
+    id = serializers.CharField()
+
     class Meta:
         model = ScorecardHole
         exclude = ["scorecard"]
 
 
 class ScorecardSerializer(serializers.ModelSerializer):
+    id = serializers.CharField()
     scorecard_holes = ScorecardHoleSerializer(many=True)
 
     class Meta:
