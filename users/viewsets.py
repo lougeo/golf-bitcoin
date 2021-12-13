@@ -45,7 +45,7 @@ class RegistrationAPI(generics.GenericAPIView):
         )
 
 
-class TokenValidationAPI(views.APIView):
+class UserAPI(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request, *args, **kwargs):
@@ -55,10 +55,6 @@ class TokenValidationAPI(views.APIView):
 
         if valid:
             user, auth_token = valid
-            # auth_token.expiry = auth_token.expiry - datetime.timedelta(days=2)
-            # auth_token.save()
-            # user, auth_token = TokenAuthentication().authenticate(request)
-
             return Response({"user": UserSerializer(user).data})
         else:
             raise AuthenticationFailed("Invalid Token.")
