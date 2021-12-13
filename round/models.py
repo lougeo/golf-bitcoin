@@ -59,10 +59,6 @@ class Registration(models.Model):
 
 
 class Score(models.Model):
-    """
-    Write signal where if scorecard is set,
-    """
-
     registration = models.ForeignKey(
         Registration,
         on_delete=models.CASCADE,
