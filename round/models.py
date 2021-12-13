@@ -3,20 +3,19 @@ from django.conf import settings
 
 
 class Round(models.Model):
-    """
-    Course can be null so that if there is a course that's not in the system they can still create the round.
-    As a result scorecard on score is also nullable for the same reason.
-    """
-
     course = models.ForeignKey(
         "course.Course",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="rounds",
         related_query_name="round",
     )
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, through="UserRound")
+    scorecard = models.ForeignKey(
+        "course.Scorecard",
+        on_delete=models.CASCADE,
+        related_name="rounds",
+        related_query_name="round",
+    )
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, through="Registration")
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -29,7 +28,11 @@ class Round(models.Model):
         return self.title if self.title else f"Round: {self.pk}"
 
 
-class UserRound(models.Model):
+class Registration(models.Model):
+    """
+    Through model for Round <-> User.
+    """
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -60,45 +63,20 @@ class Score(models.Model):
     Write signal where if scorecard is set,
     """
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+    registration = models.ForeignKey(
+        Registration,
+        on_delete=models.CASCADE,
+        related_name="registrations",
+        related_query_name="registration",
+    )
+    scorecard_hole = models.ForeignKey(
+        "course.ScorecardHole",
         on_delete=models.CASCADE,
         related_name="scores",
         related_query_name="score",
     )
-    round = models.ForeignKey(
-        Round,
-        on_delete=models.CASCADE,
-        related_name="scores",
-        related_query_name="score",
-    )
-    scorecard = models.ForeignKey(
-        "course.Scorecard",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="scores",
-        related_query_name="score",
-    )
+
+    strokes = models.PositiveSmallIntegerField()
 
     def __str__(self):
         return f"Score: {self.pk}"
-
-
-class Hole(models.Model):
-    score = models.ForeignKey(
-        Score,
-        on_delete=models.CASCADE,
-        related_name="holes",
-        related_query_name="holes",
-    )
-
-    number = models.PositiveSmallIntegerField()
-    strokes = models.PositiveSmallIntegerField()
-
-    """
-    Copy all metadata fields form ScorecardHole, but nullable.
-    """
-    par = models.PositiveSmallIntegerField(null=True, blank=True)
-    distance = models.PositiveSmallIntegerField(null=True, blank=True)
-    handicap = models.PositiveSmallIntegerField(null=True, blank=True)
