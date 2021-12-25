@@ -22,7 +22,7 @@ class Round(models.Model):
     tee_time = models.DateTimeField(blank=True, null=True)
 
     title = models.CharField(max_length=150)
-    description = models.TextField(max_length=500)
+    description = models.TextField(max_length=500, blank=True)
 
     def __str__(self):
         return self.title if self.title else f"Round: {self.pk}"
