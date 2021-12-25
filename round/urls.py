@@ -1,7 +1,14 @@
-from django.urls import path
+from django.urls import path, include
 
-from . import views
+from rest_framework import routers
+
+from .viewsets import RoundViewSet
 
 app_name = "round"
 
-urlpatterns = []
+router = routers.SimpleRouter()
+router.register("rounds", RoundViewSet)
+
+urlpatterns = [
+    path("api/", include(router.urls)),
+]

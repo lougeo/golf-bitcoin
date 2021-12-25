@@ -52,7 +52,7 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CourseListSerializer(serializers.ModelSerializer):
+class MinCourseSerializer(serializers.ModelSerializer):
     id = serializers.CharField()
 
     class Meta:

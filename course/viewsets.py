@@ -2,7 +2,7 @@ from rest_framework import viewsets
 
 from .filters import CourseFilter
 from .models import Course, Scorecard, ScorecardHole
-from .serializers import CourseSerializer, CourseListSerializer, ScorecardSerializer
+from .serializers import CourseSerializer, MinCourseSerializer, ScorecardSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -13,7 +13,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return CourseSerializer
         else:
-            return CourseListSerializer
+            return MinCourseSerializer
 
 
 class ScorecardViewSet(viewsets.ModelViewSet):
