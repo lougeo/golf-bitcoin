@@ -18,10 +18,14 @@ from django.urls import path, include
 from django.views.generic.base import TemplateView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
     path("", include("course.urls", namespace="courses")),
     path("", include("round.urls", namespace="rounds")),
     path("", include("users.urls", namespace="users")),
+    path("", include("friend.urls", namespace="friends")),
     path("accounts/", include("django.contrib.auth.urls")),
-    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain"))
+    path(
+        "robots.txt",
+        TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
+    ),
 ]

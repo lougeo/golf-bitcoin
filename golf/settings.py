@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "users",
     "round",
     "course",
+    "friend",
 ]
 
 AUTH_USER_MODEL = "users.GolfUser"
