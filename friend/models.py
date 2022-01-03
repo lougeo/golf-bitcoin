@@ -69,8 +69,8 @@ class Friendship(models.Model):
     friend = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="friendships",
-        related_query_name="friendship",
+        related_name="friends_friendships",
+        related_query_name="friends_friendship",
     )
 
     status = models.ForeignKey(
@@ -101,14 +101,14 @@ class FriendRequest(models.Model):
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="friend_requests",
-        related_query_name="friend_request",
+        related_name="sender_friend_requests",
+        related_query_name="sender_friend_request",
     )
     receiver = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="friend_requests",
-        related_query_name="friend_request",
+        related_name="receiver_friend_requests",
+        related_query_name="receiver_friend_request",
     )
 
     accepted = models.BooleanField(null=True)
