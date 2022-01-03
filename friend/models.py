@@ -5,7 +5,11 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class FriendshipManager(models.Manager):
-    def add(self, friend, status=None, set_friend=True):
+    """
+    Use these methods for creating/removing/updating Friendships.
+    """
+
+    def add(self, user, friend, status=None, set_friend=True):
         """
         Add a new friend.
         """
@@ -13,37 +17,35 @@ class FriendshipManager(models.Manager):
         if status is None:
             status = FriendshipStatus.objects.accepted()
 
-        friendship, created = Friendship.objects.get_or_create(
-            user=self,
-            friend=friend,
-            status=status,
+        friendship, created = Friendship.objects.update_or_create(
+            user=user, friend=friend, defaults={"status": status}
         )
 
         if set_friend:
             return (
                 friendship,
-                friend.friends.add(self, status=status, set_friend=False),
+                self.add(friend, user, status=status, set_friend=False),
             )
         else:
             return friendship
 
-    def remove(self, friend, set_friend=True):
-        """
-        Remove a friend.
-        """
+    # def remove(self, friend, set_friend=True):
+    #     """
+    #     Remove a friend.
+    #     """
 
-        result = Friendship.objects.filter(
-            user=self,
-            friend=friend,
-        ).delete()
+    #     result = Friendship.objects.filter(
+    #         user=self,
+    #         friend=friend,
+    #     ).delete()
 
-        if set_friend:
-            return (
-                result,
-                friend.friends.remove(self, set_friend=False),
-            )
-        else:
-            return result
+    #     if set_friend:
+    #         return (
+    #             result,
+    #             friend.friends.remove(self, set_friend=False),
+    #         )
+    #     else:
+    #         return result
 
     def is_mutual_friend(self, friend):
         """
