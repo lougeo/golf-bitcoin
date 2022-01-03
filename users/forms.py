@@ -19,7 +19,7 @@ class FriendsInlineForm(forms.ModelForm):
     def save(self, commit=True):
         super().save(commit=commit)
 
-        User.friends.through.objects.add(
+        User.friends.through.objects.kindle(
             self.instance.user, self.instance.friend, status=self.instance.status
         )
 

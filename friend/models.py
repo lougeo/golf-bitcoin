@@ -5,13 +5,9 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class FriendshipManager(models.Manager):
-    """
-    Use these methods for creating/removing/updating Friendships.
-    """
-
-    def add(self, user, friend, status=None, set_friend=True):
+    def kindle(self, user, friend, status=None, set_friend=True):
         """
-        Add a new friend.
+        Update or create a new friend.
         """
 
         if status is None:
@@ -29,27 +25,9 @@ class FriendshipManager(models.Manager):
         else:
             return friendship
 
-    # def remove(self, friend, set_friend=True):
-    #     """
-    #     Remove a friend.
-    #     """
-
-    #     result = Friendship.objects.filter(
-    #         user=self,
-    #         friend=friend,
-    #     ).delete()
-
-    #     if set_friend:
-    #         return (
-    #             result,
-    #             friend.friends.remove(self, set_friend=False),
-    #         )
-    #     else:
-    #         return result
-
     def is_mutual_friend(self, friend):
         """
-        Is this a friend?
+        Is this a mutual friend?
         """
         # if friend in self.friends.all():
         #     return True
@@ -136,7 +114,7 @@ class FriendRequest(models.Model):
         Accept a friend request.
         """
 
-        self.sender.add_friend(self.receiver)
+        Friendship.objects.kindle(self.sender, self.receiver)
         self.accepted = True
         self.active = False
         self.save()
@@ -145,7 +123,8 @@ class FriendRequest(models.Model):
         """
         Decline a friend request.
         """
-
+        status = FriendshipStatus.objects.declined()
+        Friendship.objects.kindle(self.sender, self.receiver, status=status)
         self.accepted = False
         self.active = False
         self.save()
@@ -164,6 +143,9 @@ class FriendRequest(models.Model):
 class FriendshipStatusManager(models.Manager):
     def accepted(self):
         return self.get(slug="accepted")
+
+    def declined(self):
+        return self.get(slug="declined")
 
 
 class FriendshipStatus(models.Model):

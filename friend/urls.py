@@ -1,7 +1,14 @@
-from django.urls import path
+from django.urls import path, include
 
-from . import views
+from rest_framework import routers
 
-app_name = "users"
+from .viewsets import FriendRequestViewSet
 
-urlpatterns = []
+app_name = "friend"
+
+router = routers.SimpleRouter()
+router.register("friendrequests", FriendRequestViewSet)
+
+urlpatterns = [
+    path("api/", include(router.urls)),
+]
