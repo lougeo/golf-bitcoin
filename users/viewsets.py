@@ -55,6 +55,6 @@ class UserAPI(views.APIView):
 
         if valid:
             user, auth_token = valid
-            return Response({"user": UserSerializer(user).data})
+            return Response(UserSerializer(user).data)
         else:
             raise AuthenticationFailed("Invalid Token.")
