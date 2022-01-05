@@ -1,5 +1,6 @@
 import datetime
 from django.contrib.auth import login
+from django.db.models import Q
 
 from rest_framework import viewsets, views, permissions, generics
 from rest_framework.exceptions import AuthenticationFailed
@@ -10,6 +11,10 @@ from knox.auth import TokenAuthentication
 from knox.views import LoginView as KnoxLoginView
 from knox.models import AuthToken
 
+from friend.models import FriendshipStatus
+
+from .models import GolfUser
+from .paginators import UserPaginator
 from .serializers import (
     CreateUserSerializer,
     UserSerializer,
@@ -58,3 +63,27 @@ class UserAPI(views.APIView):
             return Response(UserSerializer(user).data)
         else:
             raise AuthenticationFailed("Invalid Token.")
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = GolfUser.objects.all().order_by("first_name")
+    serializer_class = UserSerializer
+    pagination_class = UserPaginator
+
+    def get_queryset(self):
+        # Need to run migrations first
+        # declined_status = FriendshipStatus.objects.declined()
+        # return GolfUser.objects.prefetch_related("friendships__status").filter(
+        #     friendships__status=declined_status
+        # )
+
+        search = self.request.GET.get("search")
+        return (
+            GolfUser.objects.exclude(pk=self.request.user.pk)
+            .filter(
+                Q(first_name__icontains=search)
+                | Q(last_name__icontains=search)
+                | Q(email__icontains=search)
+            )
+            .order_by("first_name")
+        )
