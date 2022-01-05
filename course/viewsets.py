@@ -2,12 +2,14 @@ from rest_framework import viewsets
 
 from .filters import CourseFilter
 from .models import Course, Scorecard, ScorecardHole
+from .paginators import CoursePaginator
 from .serializers import CourseSerializer, MinCourseSerializer, ScorecardSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     filterset_class = CourseFilter
+    pagination_class = CoursePaginator
 
     def get_serializer_class(self):
         if self.action == "retrieve":

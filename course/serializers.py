@@ -53,7 +53,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class MinCourseSerializer(serializers.ModelSerializer):
-    id = serializers.CharField()
+    id = serializers.CharField(read_only=True)
 
     class Meta:
         model = Course
