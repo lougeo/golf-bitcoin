@@ -71,15 +71,13 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = UserPaginator
 
     def get_queryset(self):
-        # Need to run migrations first
-        # declined_status = FriendshipStatus.objects.declined()
-        # return GolfUser.objects.prefetch_related("friendships__status").filter(
-        #     friendships__status=declined_status
-        # )
-
         search = self.request.GET.get("search")
+        declined_status = FriendshipStatus.objects.declined()
+
         return (
-            GolfUser.objects.exclude(pk=self.request.user.pk)
+            GolfUser.objects.prefetch_related("friendships__status")
+            .exclude(pk=self.request.user.pk)
+            .exclude(friendship__status=declined_status)
             .filter(
                 Q(first_name__icontains=search)
                 | Q(last_name__icontains=search)
@@ -87,3 +85,8 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             )
             .order_by("first_name")
         )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context

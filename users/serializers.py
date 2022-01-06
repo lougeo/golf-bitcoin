@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
+from friend.models import FriendRequest
+
 User = get_user_model()
 
 
@@ -73,7 +75,32 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     id = serializers.CharField()
+    is_friend = serializers.SerializerMethodField()
+    has_pending_request = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ["id", "first_name", "last_name", "email", "is_staff", "date_joined"]
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "is_staff",
+            "date_joined",
+            "is_friend",
+            "has_pending_request",
+        ]
+
+    def get_is_friend(self, obj):
+        request = self.context.get("request")
+        return request.user.friends.filter(pk=obj.pk).exists() if request else None
+
+    def get_has_pending_request(self, obj):
+        request = self.context.get("request")
+        return (
+            FriendRequest.objects.filter(
+                sender=request.user, receiver=obj, active=True
+            ).exists()
+            if request
+            else None
+        )
