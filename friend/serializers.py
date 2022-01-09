@@ -17,3 +17,17 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
         fields = ["id", "sender", "sender_full", "receiver", "accepted"]
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance=instance, data=data, **kwargs)
+        if instance:
+            self.fields["receiver"].required = False
+
+    def update(self, instance, validated_data):
+        accepted = validated_data["accepted"]
+        if accepted:
+            instance.accept()
+        else:
+            instance.decline()
+
+        return instance

@@ -28,3 +28,9 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         request.data.update({"sender": request.user.pk})
         return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        print(request)
+        print(request.data)
+        print(args, kwargs)
+        return super().update(request, *args, **kwargs)

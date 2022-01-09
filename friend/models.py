@@ -20,7 +20,7 @@ class FriendshipManager(models.Manager):
         if set_friend:
             return (
                 friendship,
-                self.add(friend, user, status=status, set_friend=False),
+                self.kindle(friend, user, status=status, set_friend=False),
             )
         else:
             return friendship
