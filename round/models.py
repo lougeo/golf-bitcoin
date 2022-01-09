@@ -47,6 +47,7 @@ class Registration(models.Model):
     )
 
     creator = models.BooleanField(default=False)
+    accepted = models.BooleanField(null=True)
 
     class Meta:
         constraints = [
