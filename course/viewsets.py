@@ -21,6 +21,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 class ScorecardViewSet(viewsets.ModelViewSet):
     queryset = Scorecard.objects.all()
     serializer_class = ScorecardSerializer
+    pagination_class = CoursePaginator
 
     def get_queryset(self):
         """
