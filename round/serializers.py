@@ -26,18 +26,26 @@ class RoundSerializer(serializers.ModelSerializer):
         queryset=Scorecard.objects.all(), write_only=True
     )
     set_users = serializers.PrimaryKeyRelatedField(
-        queryset=GolfUser.objects.all(), many=True, write_only=True
+        queryset=GolfUser.objects.all(), many=True, write_only=True, required=False
     )
 
     class Meta:
         model = Round
         fields = "__all__"
 
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance=instance, data=data, **kwargs)
+        if self.instance:
+            self.fields["set_course"].required = False
+            self.fields["set_scorecard"].required = False
+
     def create(self, validated_data):
+        request = self.context.get("request")
+        users = [request.user.pk]
         # Remove set_ names
         course = validated_data.pop("set_course")
         scorecard = validated_data.pop("set_scorecard")
-        users = validated_data.pop("set_users")
+        users.extend(validated_data.pop("set_users", []))
         # Add proper names
         validated_data.update(
             {
@@ -47,3 +55,10 @@ class RoundSerializer(serializers.ModelSerializer):
             }
         )
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        users = [request.user.pk]
+        users.extend(validated_data.pop("set_users", []))
+        validated_data.update({"users": users})
+        return super().update(instance, validated_data)

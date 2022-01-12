@@ -21,7 +21,7 @@ class Round(models.Model):
     updated = models.DateTimeField(auto_now=True)
     tee_time = models.DateTimeField(blank=True, null=True)
 
-    title = models.CharField(max_length=150)
+    title = models.CharField(max_length=150, blank=True)
     description = models.TextField(max_length=500, blank=True)
 
     def __str__(self):
