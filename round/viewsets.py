@@ -6,5 +6,9 @@ from .serializers import RoundSerializer
 
 
 class RoundViewSet(viewsets.ModelViewSet):
+    """
+    TODO: Restrict update to creator.
+    """
+
     queryset = Round.objects.all()
     serializer_class = RoundSerializer

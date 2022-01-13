@@ -15,6 +15,11 @@ from .models import Round, Registration, Score
 
 
 class RoundSerializer(serializers.ModelSerializer):
+    """
+    Currently, the create/update methods will add the current user to the users set.
+    This means that updating the round object should be restricted to the creator.
+    """
+
     course = MinCourseSerializer(read_only=True)
     scorecard = ScorecardSerializer(read_only=True)
     users = UserSerializer(many=True, read_only=True)
