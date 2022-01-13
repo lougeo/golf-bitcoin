@@ -1,4 +1,5 @@
 import datetime
+import json
 from django.contrib.auth import login
 from django.db.models import Q
 
@@ -72,11 +73,15 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         search = self.request.GET.get("search")
+        selected_users = [
+            int(id) for id in json.loads(self.request.GET.get("selected-users"))
+        ]
+        selected_users.append(self.request.user.pk)
         declined_status = FriendshipStatus.objects.declined()
 
         return (
             GolfUser.objects.prefetch_related("friendships__status")
-            .exclude(pk=self.request.user.pk)
+            .exclude(pk__in=selected_users)
             .exclude(friendship__status=declined_status)
             .filter(
                 Q(first_name__icontains=search)
