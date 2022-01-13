@@ -40,25 +40,34 @@ class RoundSerializer(serializers.ModelSerializer):
             self.fields["set_scorecard"].required = False
 
     def create(self, validated_data):
-        request = self.context.get("request")
-        users = [request.user.pk]
         # Remove set_ names
         course = validated_data.pop("set_course")
         scorecard = validated_data.pop("set_scorecard")
-        users.extend(validated_data.pop("set_users", []))
         # Add proper names
         validated_data.update(
             {
                 "course": course,
                 "scorecard": scorecard,
-                "users": users,
             }
         )
-        return super().create(validated_data)
+        instance = super().create(validated_data)
+
+        request = self.context.get("request")
+        Registration.objects.create(
+            round=instance, user=request.user, creator=True, accepted=True
+        )
+
+        users = validated_data.pop("set_users", [])
+        for user in users:
+            Registration.objects.create(round=instance, user=user)
+
+        return instance
 
     def update(self, instance, validated_data):
+
         request = self.context.get("request")
-        users = [request.user.pk]
-        users.extend(validated_data.pop("set_users", []))
+        users = validated_data.pop("set_users", [])
+        users.append(request.user.pk)
         validated_data.update({"users": users})
+
         return super().update(instance, validated_data)
