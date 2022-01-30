@@ -48,6 +48,7 @@ class RoundSerializer(serializers.ModelSerializer):
         # Remove set_ names
         course = validated_data.pop("set_course")
         scorecard = validated_data.pop("set_scorecard")
+
         # Add proper names
         validated_data.update(
             {
@@ -58,13 +59,21 @@ class RoundSerializer(serializers.ModelSerializer):
         instance = super().create(validated_data)
 
         request = self.context.get("request")
-        Registration.objects.create(
+        creator_reg = Registration.objects.create(
             round=instance, user=request.user, creator=True, accepted=True
         )
+        for scorecard_hole in creator_reg.scorecard.scorecard_holes.all():
+            Score.objects.create(
+                registration=creator_reg, scorecard_hole=scorecard_hole
+            )
 
         users = validated_data.pop("set_users", [])
         for user in users:
-            Registration.objects.create(round=instance, user=user)
+            user_reg = Registration.objects.create(round=instance, user=user)
+            for scorecard_hole in user_reg.scorecard.scorecard_holes.all():
+                Score.objects.create(
+                    registration=user_reg, scorecard_hole=scorecard_hole
+                )
 
         return instance
 
